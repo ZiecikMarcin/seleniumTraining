@@ -40,6 +40,8 @@ namespace szkolenie1
             Thread.Sleep(1000);
             driver.FindElement(By.Id("at-cv-lightbox-close")).Click();
 
+
+
             driver.FindElement(By.Id("sum1")).SendKeys("8");
             driver.FindElement(By.Id("sum2")).SendKeys("4");
             driver.FindElements(By.ClassName("btn-default"))[1].Click();
