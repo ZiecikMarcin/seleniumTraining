@@ -108,14 +108,16 @@ namespace szkolenie1
 
             var selectSelector = driver.FindElement(By.Id("select-demo"));
             var selectDay = new SelectElement(selectSelector);
-
+            
+            //act
             selectDay.SelectByIndex(2);
             selectDay.SelectByText("Tuesday");
             selectDay.SelectByValue("Friday");
 
             var selectedValue = driver.FindElement(By.ClassName("selected-value"));
             var selectedValueEdited = selectedValue.Text.Substring(16);
-
+            
+            //assert
             Assert.AreEqual("Friday", selectedValueEdited);
         }
     }
