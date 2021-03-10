@@ -53,12 +53,12 @@ namespace szkolenie1
             var sum = firstDigit + secondDigit;
             var sum1 = driver.FindElement(By.Id("sum1"));
             var sum2 = driver.FindElement(By.Id("sum2"));
-            var countButton = driver.FindElements(By.ClassName("btn-default"))[1];
-            var total = driver.FindElement(By.Id("displayvalue")).Text;
+            var countButton = driver.FindElements(By.ClassName("btn-default"))[1];            
             //act
             sum1.SendKeys(firstDigit);
             sum2.SendKeys(secondDigit);
             countButton.Click();
+            var total = driver.FindElement(By.Id("displayvalue")).Text;
             //assert
             Assert.AreEqual(sum, total);
         }
