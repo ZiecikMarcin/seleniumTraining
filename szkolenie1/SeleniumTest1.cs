@@ -5,7 +5,9 @@ using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -144,17 +146,17 @@ namespace szkolenie1
             //Assert.Fail("Test shouldn't get here");
         }
 
-        /*[Test]
+        [Test]
         public void ExplicitWait()
         {
             driver.Navigate().GoToUrl("https://www.seleniumeasy.com/test/basic-first-form-demo.html");
 
             var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
-            wait.Until(d => d.FindElement(By.Id("at-cv-lightbox-close"))).Click();
+            wait.Until(d => d.FindElement(By.Id("at-cv-lightbox-close")).Displayed);
 
             var xOnPopup = driver.FindElement(By.Id("at-cv-lightbox-close"));
             xOnPopup.Click();
-        }*/
+        }
 
         [Test]
         public void DragDrop()
@@ -209,6 +211,123 @@ namespace szkolenie1
             driver.SwitchTo().Window(driver.WindowHandles.Last());
 
             var titleaaaafeter = driver.Title;
+        }
+
+        [Test]
+        public void DynamicData()
+        {
+            //arrange
+            driver.Navigate().GoToUrl("https://www.seleniumeasy.com/test/dynamic-data-loading-demo.html");
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
+
+            var button = driver.FindElement(By.Id("save"));
+
+            //act
+            button.Click();
+
+            var loader = driver.FindElement(By.Id("loading"));
+            wait.Until(l => loader.Text.Contains("First Name"));
+
+            //assert
+            Assert.That(loader.Text.Contains("First Name"));
+            Assert.That(loader.Text.Contains("Last Name"));
+        }
+
+        [Test]
+
+        public void ProgressBar()
+        {
+            //arrange
+            driver.Navigate().GoToUrl("https://www.seleniumeasy.com/test/jquery-download-progress-bar-demo.html");
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+
+            var buttonDownload = driver.FindElement(By.Id("downloadButton"));
+
+            //act
+            buttonDownload.Click();
+
+            var progressLabel = driver.FindElement(By.ClassName("progress-label"));
+            wait.Until(l => progressLabel.Text.Equals("Complete!"));
+
+            //assert
+            Assert.That(progressLabel.Text.Equals("Complete!"));
+        }
+
+        [Test]
+        public void UploadFile()
+        {
+            //arrange
+            driver.Navigate().GoToUrl("http://the-internet.herokuapp.com/upload");
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            var pathToDebug = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var fileName = "sample30k.pdf";
+            //var filePath = pathToDebug + "\\" + fileName;
+            var filePath = Path.Combine(pathToDebug, fileName);
+            var chooseFile = driver.FindElement(By.Id("file-upload"));
+            var uploadButton = driver.FindElement(By.Id("file-submit"));
+
+            //act
+            chooseFile.SendKeys(filePath);
+            uploadButton.Click();
+
+            var uploadedFiles = driver.FindElement(By.Id("uploaded-files"));
+            wait.Until(l => uploadedFiles.Displayed);
+
+            //assert
+            Assert.That(uploadedFiles.Text == fileName);
+        }
+
+        [Test]
+        public void AlertBox()
+        {
+            //arrange
+            driver.Navigate().GoToUrl("https://www.seleniumeasy.com/test/javascript-alert-box-demo.html");
+
+            var clickMe = driver.FindElements(By.ClassName("btn-default"))[0];
+            var clickMeConfirm = driver.FindElements(By.ClassName("btn-default"))[1];
+            var clickForPrompt = driver.FindElements(By.ClassName("btn-default"))[2];
+
+            var dummyText = "text123";
+
+            //act
+            clickMe.Click();
+            driver.SwitchTo().Alert().Accept();
+
+            clickMeConfirm.Click();
+            driver.SwitchTo().Alert().Accept();
+            
+            //assert
+            var confirmDemoText = driver.FindElement(By.Id("confirm-demo")).Text;
+            Assert.AreEqual(confirmDemoText, "You pressed OK!");
+
+            //act
+            clickMeConfirm.Click();
+            driver.SwitchTo().Alert().Dismiss();
+
+            //assert
+            confirmDemoText = driver.FindElement(By.Id("confirm-demo")).Text;
+            Assert.AreEqual(confirmDemoText, "You pressed Cancel!");
+
+            //act
+            clickForPrompt.Click();
+            driver.SwitchTo().Alert().SendKeys(dummyText);
+            driver.SwitchTo().Alert().Accept();
+
+            //assert
+            var promptDemoText = driver.FindElement(By.Id("prompt-demo")).Text;
+            Assert.AreEqual(promptDemoText, "You have entered '" + dummyText + "' !");
+        }
+
+        [Test]
+        public void Screenshot()
+        {
+            //arrange
+            driver.Navigate().GoToUrl("https://www.seleniumeasy.com/test/javascript-alert-box-demo.html");
+
+            Screenshot screenshot = driver.GetScreenshot();
+
+            //act
+            screenshot.SaveAsFile("C:\\Users\\mzc\\Documents\\testScreen.png");
         }
     }
 }
