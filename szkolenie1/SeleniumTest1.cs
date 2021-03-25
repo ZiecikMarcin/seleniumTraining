@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using System;
 using System.Collections.Generic;
@@ -18,10 +19,10 @@ namespace szkolenie1
         public void SetUp()
         {
             driver = new ChromeDriver();
-            driver.Navigate().GoToUrl("https://www.seleniumeasy.com/test/basic-first-form-demo.html");
+            /*driver.Navigate().GoToUrl("https://www.seleniumeasy.com/test/basic-first-form-demo.html");
             Thread.Sleep(1000);
             var xOnPopup = driver.FindElement(By.Id("at-cv-lightbox-close"));
-            xOnPopup.Click();
+            xOnPopup.Click();*/
         }
         [TearDown]
         public void TearDown()
@@ -119,6 +120,95 @@ namespace szkolenie1
             
             //assert
             Assert.AreEqual("Friday", selectedValueEdited);
+        }
+        [Test]
+        public void JQueryDropDown()
+        {
+            //arrange
+            driver.Navigate().GoToUrl("https://www.seleniumeasy.com/test/jquery-dropdown-search-demo.html");
+            var newZealandString = "New Zealand";           
+
+            //act
+            var dropDown = driver.FindElement(By.ClassName("selection"));
+            dropDown.Click();
+
+            var countryContainer = driver.FindElement(By.Id("select2-results__options")).FindElements(By.TagName("li"));
+            var countryNetherlands = countryContainer.Where(d => d.Text == "Netherlands").FirstOrDefault();
+            var countryNewZealand = countryContainer.First(d => d.Text == newZealandString);
+            countryNewZealand.Click();
+
+            //assert
+            Assert.AreEqual(newZealandString, dropDown.Text);
+            Assert.IsTrue(newZealandString == dropDown.Text);
+            Assert.That(newZealandString == dropDown.Text);
+            //Assert.Fail("Test shouldn't get here");
+        }
+
+        /*[Test]
+        public void ExplicitWait()
+        {
+            driver.Navigate().GoToUrl("https://www.seleniumeasy.com/test/basic-first-form-demo.html");
+
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(5));
+            wait.Until(d => d.FindElement(By.Id("at-cv-lightbox-close"))).Click();
+
+            var xOnPopup = driver.FindElement(By.Id("at-cv-lightbox-close"));
+            xOnPopup.Click();
+        }*/
+
+        [Test]
+        public void DragDrop()
+        {
+            //arrange
+            driver.Navigate().GoToUrl("https://www.globalsqa.com/demo-site/draganddrop/");
+
+            Thread.Sleep(1000);
+
+            var frame = driver.FindElement(By.ClassName("demo-frame"));            
+            driver.SwitchTo().Frame(frame);
+
+            var image1 = driver.FindElements(By.ClassName("ui-draggable")).FirstOrDefault();
+            var trash = driver.FindElement(By.Id("trash"));
+
+            //act
+            var action = new Actions(driver);
+            action.DragAndDrop(image1, trash).Build().Perform();
+            var trashAfterMove = trash.FindElements(By.TagName("img"));
+
+            //assert
+            Thread.Sleep(1000);
+            Assert.That(trashAfterMove.Count == 1);
+            driver.SwitchTo().DefaultContent();
+        }
+
+        [Test]
+        public void NewWindow()
+        {
+            //arrange
+            driver.Navigate().GoToUrl("https://www.seleniumeasy.com/test/table-pagination-demo.html");
+            Thread.Sleep(1000);
+            var windowHandlesBefore = driver.WindowHandles;
+            var titleBefore = driver.Title;
+
+            var crossBrowserLink = driver.FindElement(By.ClassName("top-banner"));
+            crossBrowserLink.Click();
+
+            var windowHandlesAfter = driver.WindowHandles;            
+
+            //act
+            driver.SwitchTo().Window(windowHandlesAfter.Last());
+            var titleAfter = driver.Title;
+
+            //assert
+            Assert.AreEqual("Cross Browser Testing Tool: 2050+ Real Browsers & Devices", driver.Title);
+
+            driver.Close();
+
+            var aaa = driver.WindowHandles;
+
+            driver.SwitchTo().Window(driver.WindowHandles.Last());
+
+            var titleaaaafeter = driver.Title;
         }
     }
 }
